@@ -80,6 +80,7 @@ services:
 
   cadvisor:
     image: google/cadvisor:v0.27.1
+    command: --global_housekeeping_interval=5m --housekeeping_interval=30s
     container_name: cadvisor
     volumes:
       - /:/rootfs:ro
