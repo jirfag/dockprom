@@ -1,5 +1,5 @@
 ALERT high_la
-  IF node_load1 > 2
+  IF node_load1 > 3
   FOR 30s
   LABELS { severity = "warning" }
   ANNOTATIONS {
@@ -25,7 +25,7 @@ ALERT high_memory_load
       description = "Docker host memory usage is {{ humanize $value}}%.",
   }
 
-ALERT hight_storage_load
+ALERT high_storage_load
   IF node_filesystem_free{fstype="ext4"} < 500000000
   FOR 30s
   LABELS { severity = "warning" }
