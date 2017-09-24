@@ -1,8 +1,10 @@
-version: '2'
+version: '3'
 
 networks:
   monitor-net:
     driver: bridge
+  reverse_proxy:
+    external: true
 
 volumes:
     prometheus_data: {}
@@ -24,17 +26,21 @@ services:
     restart: unless-stopped
     expose:
       - 9090
-    ports:
-      - 9090:9090
     networks:
       - monitor-net
+      - reverse_proxy
+    environment:
+      - VIRTUAL_HOST=prom.${DOMAIN}
+      - VIRTUAL_PORT=9090
+      - LETSENCRYPT_HOST=prom.${DOMAIN}
+      - LETSENCRYPT_EMAIL=contact@${DOMAIN}
     labels:
       org.label-schema.group: "monitoring"
-  
+
   alertmanager:
     image: prom/alertmanager
     container_name: alertmanager
-    volumes: 
+    volumes:
       - ./alertmanager/:/etc/alertmanager/
     command:
       - '-config.file=/etc/alertmanager/config.yml'
@@ -42,10 +48,14 @@ services:
     restart: unless-stopped
     expose:
       - 9093
-    ports:
-      - 9093:9093
     networks:
       - monitor-net
+      - reverse_proxy
+    environment:
+      - VIRTUAL_HOST=alertmanager.${DOMAIN}
+      - VIRTUAL_PORT=9093
+      - LETSENCRYPT_HOST=alertmanager.${DOMAIN}
+      - LETSENCRYPT_EMAIL=contact@${DOMAIN}
     labels:
       org.label-schema.group: "monitoring"
 
@@ -69,7 +79,7 @@ services:
       org.label-schema.group: "monitoring"
 
   cadvisor:
-    image: google/cadvisor:v0.26.1
+    image: google/cadvisor:v0.27.1
     container_name: cadvisor
     volumes:
       - /:/rootfs:ro
@@ -83,7 +93,7 @@ services:
       - monitor-net
     labels:
       org.label-schema.group: "monitoring"
-  
+
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -94,9 +104,13 @@ services:
     restart: unless-stopped
     expose:
       - 3000
-    ports:
-      - 3000:3000
     networks:
       - monitor-net
+      - reverse_proxy
+    environment:
+      - VIRTUAL_HOST=grafana.${DOMAIN}
+      - VIRTUAL_PORT=3000
+      - LETSENCRYPT_HOST=grafana.${DOMAIN}
+      - LETSENCRYPT_EMAIL=contact@${DOMAIN}
     labels:
       org.label-schema.group: "monitoring"
