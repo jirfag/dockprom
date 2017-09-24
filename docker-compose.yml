@@ -2,7 +2,7 @@ version: '3'
 
 networks:
   monitor-net:
-    driver: bridge
+    external: true
   reverse_proxy:
     external: true
 
